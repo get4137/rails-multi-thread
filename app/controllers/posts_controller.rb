@@ -23,9 +23,10 @@ class PostsController < ApplicationController
   # POST /posts.json
   def create
     start_time = Time.now
-    update_all_comments
+    cpu_cores_number = check_cpu
+    do_something(cpu_cores_number)
     end_time = Time.now
-    @post = Post.new(body: end_time - start_time, title: post_params[:title])
+    @post = Post.new(body: end_time - start_time, title: "cores were used: #{cpu_cores_number}")
     respond_to do |format|
       if @post.save
         format.html { redirect_to @post, notice: 'Post was successfully created.' }
@@ -40,11 +41,12 @@ class PostsController < ApplicationController
   # PATCH/PUT /posts/1
   # PATCH/PUT /posts/1.json
   def update
+    start_time = Time.now
+    cpu_cores_number = check_cpu
+    do_something(cpu_cores_number)
+    end_time = Time.now
     respond_to do |format|
-      start_time = Time.now
-      update_all_comments
-      end_time = Time.now
-      if @post.update(body: end_time - start_time, title: post_params[:title])
+      if @post.update(body: end_time - start_time, title: "cores were used: #{cpu_cores_number}")
         format.html { redirect_to @post, notice: 'Post was successfully updated.' }
         format.json { render :show, status: :ok, location: @post }
       else
@@ -71,19 +73,29 @@ class PostsController < ApplicationController
     @post = Post.find(params[:id])
   end
 
-  # 1000 comments update
-  def update_all_comments
-    results = []
-    if post_params[:title].to_i == 1
-      Parallel.each(['a','b','c'], in_processors: Etc.nprocessors) do |n|
-        (1..10000000).each do |c|
-          results << n if (c*2)%7 == 0
-        end
-      end
-    else
-      (1..10000000).each do |c|
-        results << n if (c*2)%7 == 0
-      end
+  def do_something(cpu_cores_number)
+    Parallel.each(Post::ARR, in_processes: cpu_cores_number) do |arr|
+      math_operation(arr)
+    end
+  end
+
+  def check_cpu
+    physical_cpu_core_number = Concurrent.physical_processor_count
+    @cpu = if post_params['title'].to_i < 2
+             1
+           elsif post_params['title'].to_i > physical_cpu_core_number
+             physical_cpu_core_number
+           else
+             post_params['title'].to_i
+           end
+  end
+
+  def math_operation(arr)
+    arr.each do |c|
+      c.even?
+      c % 111 == 0
+      c.odd?
+      puts c if c % 25_239_357 == 0
     end
   end
 

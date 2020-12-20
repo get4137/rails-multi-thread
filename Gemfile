@@ -23,6 +23,7 @@ gem 'jbuilder', '~> 2.7'
 # gem 'bcrypt', '~> 3.1.7'
 gem 'parallel'
 gem 'rubocop'
+gem 'concurrent-ruby'
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
 

@@ -73,13 +73,16 @@ class PostsController < ApplicationController
 
   # 1000 comments update
   def update_all_comments
+    results = []
     if post_params[:title].to_i == 1
-      Parallel.each(Comment.all, in_processors: Etc.nprocessors) do |comment|
-        comment.update(body: rand(1..1000))
+      Parallel.each(['a','b','c'], in_processors: Etc.nprocessors) do |n|
+        (1..10000000).each do |c|
+          results << n if (c*2)%7 == 0
+        end
       end
     else
-      Comment.all.each do |comment|
-        comment.update(body: rand(1..1000))
+      (1..10000000).each do |c|
+        results << n if (c*2)%7 == 0
       end
     end
   end

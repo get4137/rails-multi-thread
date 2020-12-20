@@ -19,9 +19,6 @@ ActiveRecord::Schema.define(version: 2020_12_08_202648) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "data_migrations", primary_key: "version", id: :string, force: :cascade do |t|
-  end
-
   create_table "posts", force: :cascade do |t|
     t.string "title"
     t.text "body"
